@@ -4,7 +4,7 @@
 
 Name:		xerces-j2
 Version:	2.9.0
-Release: 	%mkrel 3
+Release: 	%mkrel 4
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -20,8 +20,8 @@ Patch0:         %{name}-build.patch
 Patch1:         %{name}-libgcj.patch
 Provides:	jaxp_parser_impl
 Requires:	xalan-j2
-Requires:	xml-commons-apis
-Requires:	xml-commons-resolver >= 0:1.1
+Requires:	xml-commons-jaxp-1.3-apis
+Requires:	xml-commons-resolver12 >= 0:1.1
 Requires(post):	/usr/sbin/update-alternatives
 Requires(preun): /usr/sbin/update-alternatives
 BuildRequires:	java-devel
@@ -142,8 +142,8 @@ export OPT_JAR_LIST=
 %{ant} \
 	-Dbuild.compiler=modern \
 	-Dtools.dir=%{_javadir} \
-	-Djar.apis=xml-commons-apis.jar \
-	-Djar.resolver=xml-commons-resolver.jar \
+	-Djar.apis=xml-commons-jaxp-1.3-apis.jar \
+	-Djar.resolver=xml-commons-resolver12.jar \
         -Djar.serializer=xalan-j2-serializer.jar \
 	clean jars javadocs
 export GCJ_PROPERTIES=
