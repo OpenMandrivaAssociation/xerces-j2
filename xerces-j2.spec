@@ -22,8 +22,8 @@ Provides:	jaxp_parser_impl
 Requires:	xalan-j2
 Requires:	xml-commons-jaxp-1.3-apis
 Requires:	xml-commons-resolver12 >= 0:1.1
-Requires(post):	/usr/sbin/update-alternatives
-Requires(preun): /usr/sbin/update-alternatives
+Requires(post):	update-alternatives
+Requires(preun): update-alternatives
 BuildRequires:	java-devel
 BuildRequires:	ant >= 0:1.5
 BuildRequires:	jpackage-utils >= 0:1.5
