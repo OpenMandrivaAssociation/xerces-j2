@@ -4,7 +4,7 @@
 
 Name:		xerces-j2
 Version:	2.9.0
-Release: 	%mkrel 4
+Release: 	%mkrel 5
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -37,8 +37,6 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Obsoletes:	xerces-j <= 0:2.2
 %if %{gcj_support}
 BuildRequires:    java-gcj-compat-devel >= 0:1.0.31
-Requires(post):   java-gcj-compat >= 0:1.0.31
-Requires(postun): java-gcj-compat >= 0:1.0.31
 %else
 BuildArch:        noarch
 %endif
@@ -103,10 +101,6 @@ Javadoc for other %{name} components.
 Summary:	Demo for %{name}
 Group:		Development/Java
 Requires:	%{name} = %{epoch}:%{version}-%{release}
-%if %{gcj_support}
-Requires(post): java-gcj-compat >= 0:1.0.31
-Requires(postun): java-gcj-compat >= 0:1.0.31
-%endif
 
 %description    demo
 Demonstrations and samples for %{name}.
