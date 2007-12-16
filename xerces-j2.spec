@@ -4,7 +4,7 @@
 
 Name:		xerces-j2
 Version:	2.9.0
-Release: 	%mkrel 6
+Release: 	%mkrel 7
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -26,7 +26,7 @@ Requires(post):	update-alternatives
 Requires(preun): update-alternatives
 BuildRequires:	java-devel
 BuildRequires:	ant >= 0:1.5
-BuildRequires:	jpackage-utils >= 0:1.5
+BuildRequires:	java-rpmbuild >= 0:1.5
 BuildRequires:	jaxp_parser_impl
 BuildRequires:	xalan-j2
 BuildRequires:	xml-commons-resolver12 >= 0:1.3
