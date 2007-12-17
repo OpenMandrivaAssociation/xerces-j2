@@ -32,7 +32,6 @@ BuildRequires:	xalan-j2
 BuildRequires:	xml-commons-resolver12 >= 0:1.3
 BuildRequires:	xml-commons-jaxp-1.3-apis
 BuildRequires:  coreutils
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 # RHEL3 and FC2
 Obsoletes:	xerces-j <= 0:2.2
 %if %{gcj_support}
