@@ -4,7 +4,7 @@
 
 Name:		xerces-j2
 Version:	2.9.0
-Release: 	%mkrel 7
+Release: 	%mkrel 8
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -64,8 +64,6 @@ page.
 %package        javadoc-impl
 Summary:	Javadoc for %{name} implementation
 Group:		Development/Java
-Requires(post): coreutils
-Requires(postun): coreutils
 
 %description    javadoc-impl
 Javadoc for %{name} implementation.
@@ -73,8 +71,6 @@ Javadoc for %{name} implementation.
 %package        javadoc-apis
 Summary:	Javadoc for %{name} apis
 Group:		Development/Java
-Requires(post): coreutils
-Requires(postun): coreutils
 
 %description    javadoc-apis
 Javadoc for %{name} apis.
@@ -82,8 +78,6 @@ Javadoc for %{name} apis.
 %package        javadoc-xni
 Summary:	Javadoc for %{name} xni
 Group:		Development/Java
-Requires(post): coreutils
-Requires(postun): coreutils
 
 %description    javadoc-xni
 Javadoc for %{name} xni.
@@ -91,8 +85,6 @@ Javadoc for %{name} xni.
 %package        javadoc-other
 Summary:	Javadoc for other %{name} components
 Group:		Development/Java
-Requires(post): coreutils
-Requires(postun): coreutils
 
 %description    javadoc-other
 Javadoc for other %{name} components.
@@ -124,15 +116,13 @@ cp -a %{SOURCE5} tools/org/apache/xerces/util
 
 
 %build
-export JAVA_HOME=%{_jvmdir}/java-gcj
 pushd tools
-export GCJ_PROPERTIES="gnu.gcj.precompiled.db.path=/tmp"
 %{javac} -classpath $(build-classpath ant) org/apache/xerces/util/XJavac.java
 mkdir bin && %{jar} cf bin/xjavac.jar org/apache/xerces/util/XJavac.class
 popd
 
 export CLASSPATH=
-export OPT_JAR_LIST=
+export OPT_JAR_LIST=:
 %{ant} \
 	-Dbuild.compiler=modern \
 	-Dtools.dir=%{_javadir} \
@@ -184,10 +174,6 @@ cp -p build/xercesSamples.jar \
   $RPM_BUILD_ROOT%{_datadir}/%{name}/%{name}-samples.jar
 cp -pr data $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-# jaxp_parser_impl ghost symlink
-ln -s %{_sysconfdir}/alternatives \
-  $RPM_BUILD_ROOT%{_javadir}/jaxp_parser_impl.jar
-
 %if %{gcj_support}
 %{_bindir}/aot-compile-rpm
 %endif
@@ -199,24 +185,8 @@ rm -rf $RPM_BUILD_ROOT
 %pre
 rm -f %{_javadir}/xerces.jar
 
-%post javadoc-apis
-rm -f %{_javadocdir}/%{name}-apis
-ln -s %{name}-apis-%{version} %{_javadocdir}/%{name}-apis
-
-%post javadoc-impl
-rm -f %{_javadocdir}/%{name}-impl
-ln -s %{name}-impl-%{version} %{_javadocdir}/%{name}-impl
-
-%post javadoc-other
-rm -f %{_javadocdir}/%{name}-other
-ln -s %{name}-other-%{version} %{_javadocdir}/%{name}-other
-
-%post javadoc-xni
-rm -f %{_javadocdir}/%{name}-xni
-ln -s %{name}-xni-%{version} %{_javadocdir}/%{name}-xni
-
 %post
-update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
+%{_sbindir}/update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
   jaxp_parser_impl %{_javadir}/%{name}.jar 40
 %if %{gcj_support}
 %{update_gcjdb}
@@ -225,7 +195,7 @@ update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
 %preun
 {
   [ $1 = 0 ] || exit 0
-  update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar
+  %{_sbindir}/update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar
 } >/dev/null 2>&1 || :
 
 %if %{gcj_support}
@@ -246,7 +216,6 @@ update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
 %doc LICENSE.serializer.txt NOTICE NOTICE.resolver.txt
 %doc NOTICE.serializer.txt README Readme.html
 %{_javadir}/%{name}*.jar
-%ghost %{_javadir}/jaxp_parser_impl.jar
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
 %attr(-,root,root) %{_libdir}/gcj/%{name}/%{name}-%{version}.jar.*
@@ -282,5 +251,3 @@ update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
 %files scripts
 %defattr(0755,root,root,0755)
 %{_bindir}/*
-
-
