@@ -4,7 +4,7 @@
 
 Name:		xerces-j2
 Version:	2.9.0
-Release: 	%mkrel 14
+Release: 	%mkrel 15
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -18,6 +18,7 @@ Source4:        %{name}-constants.sh
 Source5:	XJavac.java
 Patch0:         %{name}-build.patch
 Patch1:         %{name}-libgcj.patch
+Patch2:		xerces-2_9_0-CVE-2009-2625.diff
 Provides:	jaxp_parser_impl
 Requires:	xalan-j2
 Requires:	xml-commons-jaxp-1.3-apis
@@ -114,6 +115,7 @@ mkdir -p tools/org/apache/xerces/util
 cp -a %{SOURCE5} tools/org/apache/xerces/util
 %patch1 -p0 -b .libgcj
 
+%patch2 -p0 -b .CVE-2009-2625
 
 %build
 pushd tools
