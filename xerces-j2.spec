@@ -1,6 +1,6 @@
 %define cvs_version	2_9_0
 %define section		free
-%define gcj_support	1
+%define gcj_support	0
 
 Name:		xerces-j2
 Version:	2.9.0
