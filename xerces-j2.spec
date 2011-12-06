@@ -2,7 +2,7 @@
 
 Name:          xerces-j2
 Version:       2.11.0
-Release:       6
+Release:       8
 Summary:       Java XML parser
 Group:         Development/Java
 License:       ASL 2.0
