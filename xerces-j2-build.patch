@@ -1,6 +1,24 @@
---- build.xml.orig	2010-11-26 20:42:11.000000000 +0000
-+++ build.xml	2010-12-11 19:20:35.913500731 +0000
-@@ -108,7 +108,6 @@
+--- xerces-2_9_0/build.xml.build	2006-11-23 00:37:02.000000000 +0100
++++ xerces-2_9_0/build.xml	2006-12-15 05:37:59.000000000 +0100
+@@ -41,7 +41,7 @@
+   <!-- enable compilation under JDK 1.4 and above -->
+   <taskdef name="xjavac" classname="org.apache.xerces.util.XJavac">
+     <classpath>
+-      <pathelement location="${tools.dir}/bin/xjavac.jar"/>
++      <pathelement location="./tools/bin/xjavac.jar"/>
+     </classpath>
+   </taskdef>
+ 
+@@ -88,7 +88,7 @@
+     <property name="packages" value="org.*"/>
+ 
+     <property name="doc.generator" value="org.apache.stylebook.StyleBook"/>
+-    <property name="doc.generator.package" value="${tools.dir}/stylebook-1.0-b2.jar"/>
++    <property name="doc.generator.package" value="./tools/stylebook-1.0-b2.jar"/>
+ 
+     <property name="build.src" value="${build.dir}/src"/>
+     <property name="build.dest" value="${build.dir}/classes"/>
+@@ -101,7 +101,6 @@
      <property name="distsrc.dir" value="${build.dir}/${parser.shortname}-${parser_version}"/>
      <property name="disttools.dir" value="${build.dir}/tools"/>
      <property name="distbin.dir" value="${build.dir}/${parser.shortname}-${parser_version}"/>
@@ -8,9 +26,9 @@
  
      <filter token="year" value="${year}"/>
      <filter token="version" value="${parser.Version}"/>
-@@ -247,30 +246,6 @@
-     <copy file="${src.dir}/org/apache/xerces/impl/xpath/regex/message.properties"
-       tofile="${build.src}/org/apache/xerces/impl/xpath/regex/message_en.properties"/>
+@@ -214,28 +213,6 @@
+         </fileset>
+     </copy>
  
 -    <!-- now deal with API's:  -->
 -    <unzip src="${src.apis.zip}" dest="${build.src}">
@@ -20,7 +38,6 @@
 -                javax/xml/datatype/**
 -                javax/xml/namespace/**
 -                javax/xml/parsers/**
--                javax/xml/stream/**
 -                javax/xml/transform/**
 -                javax/xml/validation/**
 -                javax/xml/xpath/**
@@ -31,19 +48,35 @@
 -                org/w3c/dom/ls/**
 -                org/w3c/dom/ranges/**
 -                org/w3c/dom/traversal/**
--                org/w3c/dom/views/**
--                org/w3c/dom/xpath/**"
+-        	    org/w3c/dom/xpath/**"
 -        />
 -    </unzip>
 -    
      <!-- substitute tokens as needed -->
      <replace file="${build.dir}/src/org/apache/xerces/impl/Version.java" 
               token="@@VERSION@@" value="${parser.Name} ${parser.Version}"/>
-@@ -1231,30 +1206,6 @@
-     <!-- HACK: Remove reference to XML11Configurable from SAX parser -->
+@@ -333,7 +310,7 @@
+     </copy>
+     <xjavac srcdir="${build.tests}"
+            destdir="${build.dest}"
+-           classpath="${tools.dir}/${jar.apis}:${build.dir}/classes:./tools/junit.jar"
++           classpath="${tools.dir}/${jar.apis}:${build.dir}/classes:${tools.dir}/junit.jar"
+            debug="${debug}"
+            includeAntRuntime="false"
+            includeJavaRuntime="true"/>
+@@ -378,7 +355,7 @@
+   <target name="docs" depends="prepare, prepare-docs">
+     <echo message="Building docs for ${parser.Name} ${parser.Version} ..." />
+     <java fork="yes"
+-          classpath="${java.class.path}:${doc.generator.package}:./tools/xalan.jar"
++          classpath="${java.class.path}:${doc.generator.package}:${tools.dir}/xalan.jar"
+           classname="${doc.generator}"
+           failOnError="yes">
+       <arg value="targetDirectory=${build.docs}"/>
+@@ -1181,29 +1158,6 @@
      <replace file="${build.dir}/src/org/apache/xerces/parsers/AbstractSAXParser.java"
               token="return (fConfiguration instanceof XML11Configurable);" value="return false;"/>
-- 
+  
 -    <!-- now deal with API's:  -->
 -    <unzip src="${src.apis.zip}" dest="${build.src}">
 -        <patternset
@@ -52,7 +85,6 @@
 -                javax/xml/datatype/**
 -                javax/xml/namespace/**
 -                javax/xml/parsers/**
--                javax/xml/stream/**
 -                javax/xml/transform/**
 -                javax/xml/validation/**
 -                javax/xml/xpath/**
@@ -63,10 +95,11 @@
 -                org/w3c/dom/ls/**
 -                org/w3c/dom/ranges/**
 -                org/w3c/dom/traversal/**
--                org/w3c/dom/views/**
 -                org/w3c/dom/xpath/**"
 -        />
 -    </unzip>
- 
- 
+-
+-
      <!-- substitute tokens as needed -->
+     <replace file="${build.dir}/src/org/apache/xerces/impl/Version.java" 
+              token="@@VERSION@@" value="${parser.Name} ${parser.Version}"/>
