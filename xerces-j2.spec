@@ -1,27 +1,24 @@
-%define cvs_version	2_9_0
-%define section		free
-%define gcj_support	1
+%define cvs_version	2_11_0
 
 Name:		xerces-j2
-Version:	2.9.0
-Release: 	17
+Version:	2.11.0
+Release: 	1
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
 URL:		http://xml.apache.org/xerces2-j/
 Group:		Development/Java
-Source0:	http://www.apache.org/dist/xml/xerces-j/Xerces-J-src.%{version}.tar.gz
-Source1:	http://www.apache.org/dist/xml/xerces-j/Xerces-J-src.%{version}.tar.gz.md5
-Source2:	http://www.apache.org/dist/xml/xerces-j/Xerces-J-src.%{version}.tar.gz.sig
-Source3:    %{name}-version.sh
-Source4:    %{name}-constants.sh
-Source5:	XJavac.java
-Patch0:     %{name}-build.patch
-Patch1:     %{name}-libgcj.patch
-Patch2:		xerces-2_9_0-CVE-2009-2625.diff
+Source0:	http://www.eu.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz
+Source1:	http://www.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz.md5
+Source2:	http://www.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz.asc
+Source3:	%{name}-version.sh
+Source4:	%{name}-constants.sh
+Source5:	https://svn.apache.org/repos/asf/xerces/java/trunk/tools/src/XJavac.java
+Patch0:		%{name}-libgcj.patch
+Patch1:		xerces-2.11.0-system-xml-apis.patch
 Provides:	jaxp_parser_impl
 Requires:	xalan-j2
-Requires:	xml-commons-jaxp-1.3-apis
+Requires:	xml-commons-jaxp-1.4-apis
 Requires:	xml-commons-resolver12 >= 0:1.1
 Requires(post):	update-alternatives
 Requires(preun): update-alternatives
@@ -32,16 +29,12 @@ BuildRequires:	java-rpmbuild >= 0:1.5
 BuildRequires:	jaxp_parser_impl
 BuildRequires:	xalan-j2
 BuildRequires:	xml-commons-resolver12 >= 0:1.3
-BuildRequires:	xml-commons-jaxp-1.3-apis
+BuildRequires:	xml-commons-jaxp-1.4-apis xml-commons-jaxp-1.4-apis-javadoc
 BuildRequires:  coreutils
 
 # RHEL3 and FC2
 Obsoletes:	xerces-j <= 0:2.2
-%if %{gcj_support}
-BuildRequires:    java-gcj-compat-devel >= 0:1.0.31
-%else
-BuildArch:        noarch
-%endif
+BuildArch:	noarch
 
 %description
 Welcome to the future! Xerces2 is the next generation of high
@@ -110,13 +103,11 @@ Additional utility scripts for %{name}.
 
 %prep
 %setup -q -n xerces-%{cvs_version}
-%patch0 -p1 -b .build
 
 mkdir -p tools/org/apache/xerces/util
 cp -a %{SOURCE5} tools/org/apache/xerces/util
-%patch1 -p0 -b .libgcj
 
-%patch2 -p0 -b .CVE-2009-2625
+%apply_patches
 
 %build
 pushd tools
@@ -126,10 +117,11 @@ popd
 
 export CLASSPATH=
 export OPT_JAR_LIST=:
-%{ant} \
+export JAVA_HOME=%_prefix/lib/jvm/java-1.6.0
+ant \
 	-Dbuild.compiler=modern \
 	-Dtools.dir=%{_javadir} \
-	-Djar.apis=xml-commons-jaxp-1.3-apis.jar \
+	-Djar.apis=xml-commons-jaxp-1.4-apis.jar \
 	-Djar.resolver=xml-commons-resolver12.jar \
         -Djar.serializer=xalan-j2-serializer.jar \
 	clean jars javadocs
@@ -142,6 +134,8 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_javadir}
 cp -p build/xercesImpl.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
 (cd $RPM_BUILD_ROOT%{_javadir} && for jar in *-%{version}.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
+# Let's keep the "standard" name as well
+ln -sf %name-%version.jar $RPM_BUILD_ROOT%_javadir/xercesImpl.jar
 
 # javadoc
 mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-impl-%{version}
@@ -177,40 +171,18 @@ cp -p build/xercesSamples.jar \
   $RPM_BUILD_ROOT%{_datadir}/%{name}/%{name}-samples.jar
 cp -pr data $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-%if %{gcj_support}
-%{_bindir}/aot-compile-rpm
-%endif
-
-
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %pre
 rm -f %{_javadir}/xerces.jar
 
 %post
 %{_sbindir}/update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
   jaxp_parser_impl %{_javadir}/%{name}.jar 40
-%if %{gcj_support}
-%{update_gcjdb}
-%endif
 
 %preun
 {
   [ $1 = 0 ] || exit 0
   %{_sbindir}/update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar
 } >/dev/null 2>&1 || :
-
-%if %{gcj_support}
-%postun
-%{clean_gcjdb}
-
-%post demo
-%{update_gcjdb}
-
-%postun demo
-%{clean_gcjdb}
-%endif
 
 %files
 %defattr(0644,root,root,0755)
@@ -219,10 +191,7 @@ rm -f %{_javadir}/xerces.jar
 %doc LICENSE.serializer.txt NOTICE NOTICE.resolver.txt
 %doc NOTICE.serializer.txt README Readme.html
 %{_javadir}/%{name}*.jar
-%if %{gcj_support}
-%dir %{_libdir}/gcj/%{name}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/%{name}-%{version}.jar.*
-%endif
+%{_javadir}/xercesImpl.jar
 
 %files javadoc-impl
 %defattr(0644,root,root,0755)
@@ -247,9 +216,6 @@ rm -f %{_javadir}/xerces.jar
 %files demo
 %defattr(0644,root,root,0755)
 %{_datadir}/%{name}
-%if %{gcj_support}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/%{name}-samples.jar.*
-%endif
 
 %files scripts
 %defattr(0755,root,root,0755)

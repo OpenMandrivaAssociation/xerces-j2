@@ -1,17 +1,12 @@
-Also apply the xjavac classpath hack when running under libgcj.
-
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=34551
-  http://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=152255
-
---- tools/org/apache/xerces/util/XJavac.java~	2005-06-10 10:18:47 +0100
-+++ tools/org/apache/xerces/util/XJavac.java	2005-06-10 11:14:35 +0100
-@@ -97,7 +97,8 @@
-             else if( (vendor.indexOf("SUN") >= 0) || 
-                      (vendor.indexOf("BLACKDOWN") >= 0) || 
-                      (vendor.indexOf("APPLE") >= 0) ||
--                     (vendor.indexOf("HEWLETT-PACKARD") >= 0)) {
-+                     (vendor.indexOf("HEWLETT-PACKARD") >= 0) ||
-+                     (vendor.indexOf("FREE SOFTWARE FOUNDATION") >= 0)) {
-                 // we're on an SUN 1.4; fiddle with the bootclasspath.
+--- xerces-2_11_0/tools/org/apache/xerces/util/XJavac.java.libgcj	2013-01-25 01:30:27.551651045 +0100
++++ xerces-2_11_0/tools/org/apache/xerces/util/XJavac.java	2013-01-25 01:31:34.236841080 +0100
+@@ -70,7 +70,8 @@ public class XJavac extends Javac {
+                      (vendor.indexOf("HEWLETT-PACKARD") >= 0) ||
+                      (vendor.indexOf("KAFFE") >= 0) ||
+                      (vendor.indexOf("SABLE") >= 0) ||
+-                     (vendor.indexOf("FREEBSD") >= 0)) {
++                     (vendor.indexOf("FREEBSD") >= 0) ||
++		     (vendor.indexOf("FREE SOFTWARE FOUNDATION") >= 0)) {
+                 // we're on an SUN 1.4 or higher; fiddle with the bootclasspath.
                  // since we can't eviscerate XML-related info here,
                  // we must use the classpath
