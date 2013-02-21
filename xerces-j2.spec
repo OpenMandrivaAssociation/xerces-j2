@@ -2,7 +2,7 @@
 
 Name:		xerces-j2
 Version:	2.11.0
-Release: 	1
+Release: 	2
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -18,7 +18,7 @@ Patch0:		%{name}-libgcj.patch
 Patch1:		xerces-2.11.0-system-xml-apis.patch
 Provides:	jaxp_parser_impl
 Requires:	xalan-j2
-Requires:	xml-commons-jaxp-1.4-apis
+Requires:	xml-commons-apis
 Requires:	xml-commons-resolver12 >= 0:1.1
 Requires(post):	update-alternatives
 Requires(preun): update-alternatives
@@ -28,8 +28,8 @@ BuildRequires:	ant >= 0:1.5
 BuildRequires:	java-rpmbuild >= 0:1.5
 BuildRequires:	jaxp_parser_impl
 BuildRequires:	xalan-j2
-BuildRequires:	xml-commons-resolver12 >= 0:1.3
-BuildRequires:	xml-commons-jaxp-1.4-apis xml-commons-jaxp-1.4-apis-javadoc
+BuildRequires:	xml-commons-resolver
+BuildRequires:	xml-commons-apis xml-commons-apis-javadoc
 BuildRequires:  coreutils
 
 # RHEL3 and FC2
@@ -121,8 +121,8 @@ export JAVA_HOME=%_prefix/lib/jvm/java-1.6.0
 ant \
 	-Dbuild.compiler=modern \
 	-Dtools.dir=%{_javadir} \
-	-Djar.apis=xml-commons-jaxp-1.4-apis.jar \
-	-Djar.resolver=xml-commons-resolver12.jar \
+	-Djar.apis=xml-commons-apis.jar \
+	-Djar.resolver=xml-commons-resolver.jar \
         -Djar.serializer=xalan-j2-serializer.jar \
 	clean jars javadocs
 export GCJ_PROPERTIES=
