@@ -19,7 +19,7 @@ Patch1:		xerces-2.11.0-system-xml-apis.patch
 Provides:	jaxp_parser_impl
 Requires:	xalan-j2
 Requires:	xml-commons-apis
-Requires:	xml-commons-resolver12 >= 0:1.1
+Requires:	xml-commons-resolver >= 0:1.1
 Requires(post):	update-alternatives
 Requires(preun): update-alternatives
 #BuildRequires:	java-devel
