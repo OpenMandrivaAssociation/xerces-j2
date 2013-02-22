@@ -18,7 +18,7 @@ Patch0:		%{name}-libgcj.patch
 Patch1:		xerces-2.11.0-system-xml-apis.patch
 Provides:	jaxp_parser_impl
 Requires:	xalan-j2
-Requires:	xml-commons-apis
+Requires:	xml-commons-apis = 1.2
 Requires:	xml-commons-resolver >= 0:1.1
 Requires(post):	update-alternatives
 Requires(preun): update-alternatives
@@ -28,7 +28,7 @@ BuildRequires:	ant >= 0:1.5
 BuildRequires:	java-rpmbuild >= 0:1.5
 BuildRequires:	jaxp_parser_impl
 BuildRequires:	xalan-j2
-BuildRequires:	xml-commons-resolver
+BuildRequires:	xml-commons-resolver = 1.2
 BuildRequires:	xml-commons-apis xml-commons-apis-javadoc
 BuildRequires:  coreutils
 
