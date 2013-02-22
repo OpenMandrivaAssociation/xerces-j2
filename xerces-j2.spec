@@ -2,7 +2,7 @@
 
 Name:		xerces-j2
 Version:	2.11.0
-Release: 	2
+Release: 	3
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -19,7 +19,7 @@ Patch1:		xerces-2.11.0-system-xml-apis.patch
 Provides:	jaxp_parser_impl
 Requires:	xalan-j2
 Requires:	xml-commons-apis
-Requires:	xml-commons-resolver = 1.2
+Requires:	xml-commons-resolver >= 0:1.4
 Requires(post):	update-alternatives
 Requires(preun): update-alternatives
 #BuildRequires:	java-devel
