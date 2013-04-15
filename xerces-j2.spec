@@ -117,7 +117,7 @@ popd
 
 export CLASSPATH=
 export OPT_JAR_LIST=:
-export JAVA_HOME=%_prefix/lib/jvm/java-1.6.0
+export JAVA_HOME=%_prefix/lib/jvm/java-1.7.0
 ant \
 	-Dbuild.compiler=modern \
 	-Dtools.dir=%{_javadir} \
