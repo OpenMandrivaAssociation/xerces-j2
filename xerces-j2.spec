@@ -2,7 +2,7 @@
 
 Name:		xerces-j2
 Version:	2.11.0
-Release: 	4
+Release: 	5
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
@@ -23,8 +23,12 @@ Requires:	xml-commons-resolver >= 0:1.4
 Requires(post):	update-alternatives
 Requires(preun): update-alternatives
 #BuildRequires:	java-devel
-BuildRequires:	java-1.7.0-openjdk-devel
+# Please do not switch this over to an OpenJDK requirement.
+# xerces-j2 is required to bootstrap OpenJDK, and there are
+# no drawbacks from building it with gcj.
+BuildRequires:	java-1.5.0-gcj-devel
 BuildRequires:	ant >= 0:1.5
+BuildRequires:	ecj >= 2:4.2.2-1
 BuildRequires:	java-rpmbuild >= 0:1.5
 BuildRequires:	jaxp_parser_impl
 BuildRequires:	xalan-j2
@@ -115,11 +119,9 @@ pushd tools
 mkdir bin && %{jar} cf bin/xjavac.jar org/apache/xerces/util/XJavac.class
 popd
 
-export CLASSPATH=
 export OPT_JAR_LIST=:
-export JAVA_HOME=%_prefix/lib/jvm/java-1.7.0
+export JAVA_HOME=%_prefix/lib/jvm/java-1.5.0-gcj
 ant \
-	-Dbuild.compiler=modern \
 	-Dtools.dir=%{_javadir} \
 	-Djar.apis=xml-commons-apis.jar \
 	-Djar.resolver=xml-commons-resolver.jar \
