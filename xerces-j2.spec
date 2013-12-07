@@ -2,7 +2,7 @@
 
 Name:		xerces-j2
 Version:	2.11.0
-Release: 	7
+Release: 	8
 Epoch:		0
 Summary:	Java XML parser
 License:	Apache License
