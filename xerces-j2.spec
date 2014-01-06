@@ -1,326 +1,419 @@
-%define cvs_version	2_11_0
+%{?_javapackages_macros:%_javapackages_macros}
+%global cvs_version 2_11_0
 
-Name:		xerces-j2
-Version:	2.11.0
-Release: 	9
-Epoch:		0
-Summary:	Java XML parser
-License:	Apache License
-URL:		http://xml.apache.org/xerces2-j/
-Group:		Development/Java
-Source0:	http://www.eu.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz
-Source1:	http://www.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz.md5
-Source2:	http://www.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz.asc
-Source3:	%{name}-version.sh
-Source4:	%{name}-constants.sh
-Source5:	https://svn.apache.org/repos/asf/xerces/java/trunk/tools/src/XJavac.java
-Patch0:		%{name}-libgcj.patch
-Patch1:		xerces-2.11.0-system-xml-apis.patch
-Provides:	jaxp_parser_impl
-Requires:	xalan-j2
-Requires:	xml-commons-apis
-Requires:	xml-commons-resolver >= 0:1.4
-Requires(post):	update-alternatives
-Requires(preun): update-alternatives
-#BuildRequires:	java-devel
-# Please do not switch this over to an OpenJDK requirement.
-# xerces-j2 is required to bootstrap OpenJDK, and there are
-# no drawbacks from building it with gcj.
-BuildRequires:	java-1.5.0-gcj-devel
-BuildRequires:	ant >= 0:1.5
-BuildRequires:	ecj >= 2:4.2.2-1
-BuildRequires:	java-rpmbuild >= 0:1.5
-BuildRequires:	jaxp_parser_impl
-BuildRequires:	xalan-j2
-BuildRequires:	xml-commons-resolver = 1:1.2
-BuildRequires:	xml-commons-apis xml-commons-apis-javadoc
-BuildRequires:  coreutils
+%define __requires_exclude system.bundle
 
-# RHEL3 and FC2
-Obsoletes:	xerces-j <= 0:2.2
-BuildArch:	noarch
+Name:          xerces-j2
+Version:       2.11.0
+Release:       16.1%{?dist}
+Summary:       Java XML parser
+
+License:       ASL 2.0
+URL:           http://xerces.apache.org/xerces2-j/
+
+Source0:       http://mirror.ox.ac.uk/sites/rsync.apache.org/xerces/j/source/Xerces-J-src.%{version}.tar.gz
+Source1:       %{name}-version.sh
+Source2:       %{name}-constants.sh
+Source11:      %{name}-version.1
+Source12:      %{name}-constants.1
+
+# Custom javac ant task used by the build
+Source3:       https://svn.apache.org/repos/asf/xerces/java/tags/Xerces-J_%{cvs_version}/tools/src/XJavac.java
+
+# Custom doclet tags used in javadocs
+Source5:       https://svn.apache.org/repos/asf/xerces/java/tags/Xerces-J_%{cvs_version}/tools/src/ExperimentalTaglet.java
+Source6:       https://svn.apache.org/repos/asf/xerces/java/tags/Xerces-J_%{cvs_version}/tools/src/InternalTaglet.java
+
+Source7:       %{name}-pom.xml
+
+# Patch the build so that it doesn't try to use bundled xml-commons source
+Patch0:        %{name}-build.patch
+
+# Patch the manifest so that it includes OSGi stuff
+Patch1:        %{name}-manifest.patch
+
+BuildArch:     noarch
+
+BuildRequires: java-devel >= 1:1.6.0
+BuildRequires: jpackage-utils
+BuildRequires: xalan-j2 >= 2.7.1
+BuildRequires: xml-commons-apis >= 1.4.01
+BuildRequires: xml-commons-resolver >= 1.2
+BuildRequires: ant
+BuildRequires: jaxp_parser_impl
+%if 0%{?fedora}
+BuildRequires: dejavu-sans-fonts
+%else
+BuildRequires: fonts-ttf-dejavu
+%endif
+BuildRequires: xerces-j2
+Requires:      java
+Requires:      jpackage-utils
+Requires:      xalan-j2 >= 2.7.1
+Requires:      xml-commons-apis >= 1.4.01
+Requires:      xml-commons-resolver >= 1.2
+
+Provides:      jaxp_parser_impl = 1.4
+Provides:      %{name}-scripts = %{version}-%{release}
+Obsoletes:     %{name}-scripts < 2.11.0-6
+
+Requires(post):  chkconfig jaxp_parser_impl
+Requires(preun): chkconfig jaxp_parser_impl
+
+# This documentation is provided by xml-commons-apis
+Obsoletes:     %{name}-javadoc-apis < %{version}-%{release}
+
+# http://mail-archives.apache.org/mod_mbox/xerces-j-dev/201008.mbox/%3COF8D7E2F83.0271A181-ON8525777F.00528302-8525777F.0054BBE0@ca.ibm.com%3E
+Obsoletes:     %{name}-manual < %{version}-%{release}
 
 %description
-Welcome to the future! Xerces2 is the next generation of high
-performance, fully compliant XML parsers in the Apache Xerces family.
-This new version of Xerces introduces the Xerces Native Interface (XNI),
-a complete framework for building parser components and configurations
-that is extremely modular and easy to program.
+Welcome to the future! Xerces2 is the next generation of high performance,
+fully compliant XML parsers in the Apache Xerces family. This new version of
+Xerces introduces the Xerces Native Interface (XNI), a complete framework for
+building parser components and configurations that is extremely modular and
+easy to program.
 
-The Apache Xerces2 parser is the reference implementation of XNI but
-other parser components, configurations, and parsers can be written
-using the Xerces Native Interface. For complete design and
-implementation documents, refer to the XNI Manual.
+The Apache Xerces2 parser is the reference implementation of XNI but other
+parser components, configurations, and parsers can be written using the Xerces
+Native Interface. For complete design and implementation documents, refer to
+the XNI Manual.
 
-Xerces 2 is a fully conforming XML Schema processor. For more
-information, refer to the XML Schema page.
+Xerces2 is a fully conforming XML Schema processor. For more information,
+refer to the XML Schema page.
 
-Xerces 2 also provides a partial implementation of Document Object Model
-Level 3 Core, Load and Save and Abstract Schemas [deprecated] Working
-Drafts. For more information, refer to the DOM Level 3 Implementation
-page.
+Xerces2 also provides a complete implementation of the Document Object Model
+Level 3 Core and Load/Save W3C Recommendations and provides a complete
+implementation of the XML Inclusions (XInclude) W3C Recommendation. It also
+provides support for OASIS XML Catalogs v1.1.
 
-%package        javadoc-impl
-Summary:	Javadoc for %{name} implementation
-Group:		Development/Java
+Xerces2 is able to parse documents written according to the XML 1.1
+Recommendation, except that it does not yet provide an option to enable
+normalization checking as described in section 2.13 of this specification. It
+also handles name spaces according to the XML Namespaces 1.1 Recommendation,
+and will correctly serialize XML 1.1 documents if the DOM level 3 load/save
+APIs are in use.
 
-%description    javadoc-impl
-Javadoc for %{name} implementation.
+%package        javadoc
+Summary:        Javadocs for %{name}
 
-%package        javadoc-apis
-Summary:	Javadoc for %{name} apis
-Group:		Development/Java
+Requires:       jpackage-utils
 
-%description    javadoc-apis
-Javadoc for %{name} apis.
+# Consolidating all javadocs into one package
+Obsoletes:      %{name}-javadoc-impl < %{version}-%{release}
+Obsoletes:      %{name}-javadoc-xs < %{version}-%{release}
+Obsoletes:      %{name}-javadoc-xni < %{version}-%{release}
+Obsoletes:      %{name}-javadoc-other < %{version}-%{release}
 
-%package        javadoc-xni
-Summary:	Javadoc for %{name} xni
-Group:		Development/Java
-
-%description    javadoc-xni
-Javadoc for %{name} xni.
-
-%package        javadoc-other
-Summary:	Javadoc for other %{name} components
-Group:		Development/Java
-
-%description    javadoc-other
-Javadoc for other %{name} components.
+%description    javadoc
+This package contains the API documentation for %{name}.
 
 %package        demo
-Summary:	Demo for %{name}
-Group:		Development/Java
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Summary:        Demonstrations and samples for %{name}
+
+Requires:       %{name} = %{version}-%{release}
 
 %description    demo
-Demonstrations and samples for %{name}.
-
-%package        scripts
-Summary:        Additional utility scripts for %{name}
-Group:          Development/Java
-Requires:       %{name} = %{epoch}:%{version}-%{release}
-Requires:	jpackage-utils >= 0:1.5
-
-%description    scripts
-Additional utility scripts for %{name}.
+%{summary}.
 
 %prep
 %setup -q -n xerces-%{cvs_version}
+%patch0 -p0 -b .orig
+%patch1 -p0 -b .orig
 
+# Copy the custom ant tasks into place
 mkdir -p tools/org/apache/xerces/util
-cp -a %{SOURCE5} tools/org/apache/xerces/util
+mkdir -p tools/bin
+cp -a %{SOURCE3} %{SOURCE5} %{SOURCE6} tools/org/apache/xerces/util
 
-%apply_patches
+# Make sure upstream hasn't sneaked in any jars we don't know about
+find -name '*.class' -exec rm -f '{}' \;
+find -name '*.jar' -exec rm -f '{}' \;
+
+sed -i 's/\r//' LICENSE README NOTICE
 
 %build
 pushd tools
-%{javac} -classpath $(build-classpath ant) org/apache/xerces/util/XJavac.java
-mkdir bin && %{jar} cf bin/xjavac.jar org/apache/xerces/util/XJavac.class
+
+# Build custom ant tasks
+javac -classpath $(build-classpath ant) org/apache/xerces/util/XJavac.java
+jar cf bin/xjavac.jar org/apache/xerces/util/XJavac.class
+
+# Build custom doc taglets
+javac -classpath /usr/lib/jvm/java/lib/tools.jar org/apache/xerces/util/*Taglet.java
+jar cf bin/xerces2taglets.jar org/apache/xerces/util/*Taglet.class
+
+ln -sf $(build-classpath xalan-j2-serializer) serializer.jar
+ln -sf $(build-classpath xml-commons-apis) xml-apis.jar
+ln -sf $(build-classpath xml-commons-resolver) resolver.jar
+ln -sf $(build-classpath xerces-j2) x.jar
 popd
 
-export OPT_JAR_LIST=:
-export JAVA_HOME=%_prefix/lib/jvm/java-1.5.0-gcj
-ant \
-	-Dtools.dir=%{_javadir} \
-	-Djar.apis=xml-commons-apis.jar \
-	-Djar.resolver=xml-commons-resolver.jar \
-        -Djar.serializer=xalan-j2-serializer.jar \
-	clean jars javadocs
-export GCJ_PROPERTIES=
+# Build everything
+export ANT_OPTS="-Xmx256m -Djava.endorsed.dirs=$(pwd)/tools -Djava.awt.headless=true -Dbuild.sysclasspath=first -Ddisconnected=true"
+ant -Djavac.source=1.5 -Djavac.target=1.5 \
+    -Dbuild.compiler=modern \
+    clean jars javadocs
 
 %install
-rm -rf $RPM_BUILD_ROOT
-
 # jars
-mkdir -p $RPM_BUILD_ROOT%{_javadir}
-cp -p build/xercesImpl.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
-(cd $RPM_BUILD_ROOT%{_javadir} && for jar in *-%{version}.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
-# Let's keep the "standard" name as well
-ln -sf %name-%version.jar $RPM_BUILD_ROOT%_javadir/xercesImpl.jar
+install -pD -T build/xercesImpl.jar %{buildroot}%{_javadir}/%{name}.jar
 
 # javadoc
-mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-impl-%{version}
-#cp -pr build/docs/javadocs/xerces2/* \
-#  $RPM_BUILD_ROOT%{_javadocdir}/%{name}-impl-%{version}
-ln -s %{name}-impl-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-impl
+mkdir -p %{buildroot}%{_javadocdir}/%{name}
+mkdir -p %{buildroot}%{_javadocdir}/%{name}/impl
+mkdir -p %{buildroot}%{_javadocdir}/%{name}/xs
+mkdir -p %{buildroot}%{_javadocdir}/%{name}/xni
+mkdir -p %{buildroot}%{_javadocdir}/%{name}/other
 
-mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-apis-%{version}
-#cp -pr build/docs/javadocs/api/* \
-#  $RPM_BUILD_ROOT%{_javadocdir}/%{name}-apis-%{version}
-ln -s %{name}-apis-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-apis
-
-mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-xni-%{version}
-#cp -pr build/docs/javadocs/xni/* \
-#  $RPM_BUILD_ROOT%{_javadocdir}/%{name}-xni-%{version}
-ln -s %{name}-xni-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-xni
-
-mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-other-%{version}
-#cp -pr build/docs/javadocs/other/* \
-#  $RPM_BUILD_ROOT%{_javadocdir}/%{name}-other-%{version}
-ln -s %{name}-other-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-other
-
-rm -rf build/docs/javadocs
+cp -pr build/docs/javadocs/xerces2/* %{buildroot}%{_javadocdir}/%{name}/impl
+cp -pr build/docs/javadocs/api/* %{buildroot}%{_javadocdir}/%{name}/xs
+cp -pr build/docs/javadocs/xni/* %{buildroot}%{_javadocdir}/%{name}/xni
+cp -pr build/docs/javadocs/other/* %{buildroot}%{_javadocdir}/%{name}/other
 
 # scripts
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_bindir}/%{name}-version
-cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}/%{name}-constants
+install -pD -m755 -T %{SOURCE1} %{buildroot}%{_bindir}/%{name}-version
+install -pD -m755 -T %{SOURCE2} %{buildroot}%{_bindir}/%{name}-constants
+
+# manual pages
+install -d -m 755 %{buildroot}%{_mandir}/man1
+install -p -m 644 %{SOURCE11} %{buildroot}%{_mandir}/man1
+install -p -m 644 %{SOURCE12} %{buildroot}%{_mandir}/man1
 
 # demo
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
-cp -p build/xercesSamples.jar \
-  $RPM_BUILD_ROOT%{_datadir}/%{name}/%{name}-samples.jar
-cp -pr data $RPM_BUILD_ROOT%{_datadir}/%{name}
+install -pD -T build/xercesSamples.jar %{buildroot}%{_datadir}/%{name}/%{name}-samples.jar
+cp -pr data %{buildroot}%{_datadir}/%{name}
 
-%pre
-rm -f %{_javadir}/xerces.jar
+# Pom
+install -pD -T -m 644 %{SOURCE7} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
+
+# Depmap with legacy depmaps for compatability
+%add_maven_depmap JPP-%{name}.pom %{name}.jar -a "xerces:xerces" -a "xerces:xmlParserAPIs"
+
+# jaxp_parser_impl ghost symlink
+ln -s %{_sysconfdir}/alternatives \
+  %{buildroot}%{_javadir}/jaxp_parser_impl.jar
 
 %post
-%{_sbindir}/update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
+update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
   jaxp_parser_impl %{_javadir}/%{name}.jar 40
 
 %preun
 {
   [ $1 = 0 ] || exit 0
-  %{_sbindir}/update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar
+  update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar
 } >/dev/null 2>&1 || :
 
 %files
-%defattr(0644,root,root,0755)
-%doc LICENSE LICENSE-SAX.html LICENSE.DOM-documentation.html
-%doc LICENSE.DOM-software.html LICENSE.resolver.txt
-%doc LICENSE.serializer.txt NOTICE NOTICE.resolver.txt
-%doc NOTICE.serializer.txt README Readme.html
-%{_javadir}/%{name}*.jar
-%{_javadir}/xercesImpl.jar
+%doc LICENSE NOTICE README
+%{_mavendepmapfragdir}/*
+%{_mavenpomdir}/*
+%{_javadir}/%{name}*
+%{_bindir}/*
+%{_mandir}/*/*
+%ghost %{_javadir}/jaxp_parser_impl.jar
 
-%files javadoc-impl
-%defattr(0644,root,root,0755)
-%doc %{_javadocdir}/%{name}-impl-%{version}
-%ghost %doc %{_javadocdir}/%{name}-impl
-
-%files javadoc-apis
-%defattr(0644,root,root,0755)
-%doc %{_javadocdir}/%{name}-apis-%{version}
-%ghost %doc %{_javadocdir}/%{name}-apis
-
-%files javadoc-other
-%defattr(0644,root,root,0755)
-%doc %{_javadocdir}/%{name}-other-%{version}
-%ghost %doc %{_javadocdir}/%{name}-other
-
-%files javadoc-xni
-%defattr(0644,root,root,0755)
-%doc %{_javadocdir}/%{name}-xni-%{version}
-%ghost %doc %{_javadocdir}/%{name}-xni
+%files javadoc
+%{_javadocdir}/%{name}/impl
+%{_javadocdir}/%{name}/xs
+%{_javadocdir}/%{name}/xni
+%{_javadocdir}/%{name}/other
 
 %files demo
-%defattr(0644,root,root,0755)
+%defattr(-,root,root,-)
 %{_datadir}/%{name}
 
-%files scripts
-%defattr(0755,root,root,0755)
-%{_bindir}/*
-
-
 %changelog
-* Mon Jun 13 2011 Oden Eriksson <oeriksson@mandriva.com> 0:2.9.0-15mdv2011.0
-+ Revision: 684471
-- sync with MDVSA-2011:108
+* Tue Aug 6 2013 Krzysztof Daniel <kdaniel@redhat.com> 2.11.0-16
+- Fix FTBFS.
 
-* Sat May 07 2011 Oden Eriksson <oeriksson@mandriva.com> 0:2.9.0-14
-+ Revision: 671304
-- mass rebuild
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.11.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-* Sat Dec 04 2010 Oden Eriksson <oeriksson@mandriva.com> 0:2.9.0-13mdv2011.0
-+ Revision: 608203
+* Mon May 20 2013 Krzysztof Daniel <kdaniel@redhat.com> 2.11.0-13
+- Add reexoport to javax.xml.
+
+* Mon Apr  8 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.11.0-13
+- Add manual pages
+
+* Fri Feb 15 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.11.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Mon Dec 17 2012 Alexander Kurtakov <akurtako@redhat.com> 2.11.0-11
+- Really restore dependencies.
+
+* Tue Dec 11 2012 Krzysztof Daniel <kdaniel@redhat.com> 2.11.0-10
+- Restored dependencies to system.bundle and javax.xml.
+
+* Tue Sep 25 2012 Krzysztof Daniel <kdaniel@redhat.com> 2.11.0-9
+- Remove javax.xml from required bundles. They are provided by JVM.
+
+* Sun Jul 22 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.11.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Wed Apr 18 2012 Krzysztof Daniel <kdaniel@redhat.com> 2.11.0-7
+- Updated OSGi MANIFEST.MF to import javax.xml
+
+* Thu Mar 08 2012 Andrew Overholt <overholt@redhat.com> - 2.11.0-6
+- Remove system.bundle OSGi requirement from MANIFEST.MF
+- Fold -scripts sub-package into main
+
+* Tue Mar 06 2012 Marek Goldmann <mgoldman@redhat.com> - 2.11.0-5
+- Use non-versioned jar name, RHBZ#800463
+- Cleanup in spec file to follow new guidelines
+- Consolidated javadocs packages
+- Removed manual subpackage because of stylebook issues, see comment on obsolete
+
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.11.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.11.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Mon Dec 13 2010 Mat Booth <fedora@matbooth.co.uk> 2.11.0-2
+- Install maven pom and depmap.
+
+* Sat Dec 11 2010 Mat Booth <fedora@matbooth.co.uk> - 2.11.0-1
+- Update to latest upstream version.
+- Provide JAXP 1.4.
+- Fix some minor rpmlint warnings.
+- Add dep on xalan-j2.
+- Fix javadoc taglets.
+
+* Sat Jun 12 2010 Mat Booth <fedora@matbooth.co.uk> - 2.9.0-4
+- Fix broken links in manual and fix javadoc requires.
+- Build 1.5 bytecode instead of 1.6, for compatibility.
+
+* Fri Jan 22 2010 Andrew Overholt <overholt@redhat.com> - 2.9.0-3
+- Fix unversioned Provides for jaxp_parser_impl (make it 1.3).
+
+* Thu Jan 14 2010 Mat Booth <fedora@matbooth.co.uk> - 2.9.0-2
+- Add a build dep on a font package because the JDK is missing a dependency
+  to function correctly in headless mode. See RHBZ #478480 and #521523.
+- Fix groups.
+
+* Tue Jan 5 2010 Mat Booth <fedora@matbooth.co.uk> - 2.9.0-1
+- Update to 2.9.0: This is the version Eclipse expects, previously the OSGi
+  manifest was lying about its version :-o
+- Enable manual sub-package now xml-stylebook is in Fedora.
+- Drop GCJ support.
+- Minor changes to spec to make it more conforming to the guidelines.
+- Drop the libgcj patch, we don't seem to need it anymore.
+- Add the OSGi manifest as part of the build instead of the install.
+- Fix packaging bug RHBZ #472646.
+
+* Mon Jul 27 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-12.3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Thu Feb 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-11.3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
+* Fri Jan 30 2009 Alexander Kurtakov <akurtako@redhat.com> 0:2.7.1-10.3
+- Add osgi manifest.
+
+* Thu Jul 10 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 0:2.7.1-10.2
+- drop repotag
+- fix license tag
+
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 0:2.7.1-10jpp.1
+- Autorebuild for GCC 4.3
+
+* Wed Mar 28 2007 Matt Wringe <mwringe@redhat.com> 0:2.7.1-9jpp.1
+- Update with newest jpp version
+- Clean up spec file for Fedora Review
+
+* Sun Aug 13 2006 Warren Togami <wtogami@redhat.com> 0:2.7.1-7jpp.2
+- fix typo in preun req
+
+* Sat Aug 12 2006 Matt Wringe <mwringe at redhat.com> 0:2.7.1-7jpp.1
+- Merge with upstream version
+
+* Sat Aug 12 2006 Matt Wringe <mwringe at redhat.com> 0:2.7.1-7jpp
+- Add conditional native compiling
+- Add missing requires for javadocs
+- Add missing requires for post and preun
+- Update version to 7jpp at Fedora's request
+
+* Sat Jul 22 2006 Jakub Jelinek <jakub@redhat.com> - 0:2.7.1-6jpp_9fc
+- Rebuilt
+
+* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 0:2.7.1-6jpp_8fc
 - rebuild
 
-* Wed Mar 17 2010 Oden Eriksson <oeriksson@mandriva.com> 0:2.9.0-12mdv2010.1
-+ Revision: 524438
-- rebuilt for 2010.1
+* Thu Mar 30 2006 Fernando Nasser <fnasser@redhat.com> 0:2.7.1-3jpp
+- Add missing BR for xml-stylebook
 
-* Sun Sep 27 2009 Tomasz Pawel Gajc <tpg@mandriva.org> 0:2.9.0-11mdv2010.0
-+ Revision: 449800
-- rebuild for new era
+* Wed Mar 22 2006 Ralph Apel <r.apel at r-apel.de> 0:2.7.1-2jpp
+- First JPP-1.7 release
+- use tools subdir and give it as java.endorsed.dirs (for java-1.4.2-bea e.g.)
 
-* Sat Mar 07 2009 Antoine Ginies <aginies@mandriva.com> 0:2.9.0-10mdv2009.1
-+ Revision: 351200
-- rebuild
+* Mon Mar  6 2006 Jeremy Katz <katzj@redhat.com> - 0:2.7.1-6jpp_7fc
+- stop scriptlet spew
 
-* Wed Jun 18 2008 Thierry Vignaud <tv@mandriva.org> 0:2.9.0-9mdv2009.0
-+ Revision: 226032
-- rebuild
-- kill re-definition of %%buildroot on Pixel's request
+* Wed Feb 22 2006 Rafael Schloming <rafaels@redhat.com> - 0:2.7.1-6jpp_6fc
+- Updated to 2.7.1
 
-  + Olivier Blin <oblin@mandriva.com>
-    - restore BuildRoot
+* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 0:2.6.2-6jpp_5fc
+- bump again for double-long bug on ppc(64)
 
-* Mon Dec 17 2007 David Walluck <walluck@mandriva.org> 0:2.9.0-8mdv2008.1
-+ Revision: 125963
-- can't own alternative symlink
-- remove javadoc %%post/%%postun
-- remove explicit settings for gcj
-- fix OPT_JAR_LIST
-- call update-alternatives with full path
+* Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 0:2.6.2-6jpp_4fc
+- rebuilt for new gcc4.1 snapshot and glibc changes
 
-* Sun Dec 16 2007 Anssi Hannula <anssi@mandriva.org> 0:2.9.0-7mdv2008.1
-+ Revision: 121052
-- buildrequire java-rpmbuild, i.e. build with icedtea on x86(_64)
+* Thu Feb  2 2006 Archit Shah <ashah@redhat.com> 0:2.6.2-6jpp_3fc
+- build xerces without using native code
 
-* Wed Sep 19 2007 Guillaume Rousse <guillomovitch@mandriva.org> 0:2.9.0-6mdv2008.0
-+ Revision: 90379
-- rebuild
+* Mon Jan  9 2006 Archit Shah <ashah@redhat.com> 0:2.6.2-6jpp_2fc
+- rebuilt for new gcj
 
-* Sat Sep 15 2007 Anssi Hannula <anssi@mandriva.org> 0:2.9.0-5mdv2008.0
-+ Revision: 87272
-- rebuild to filter out autorequires of GCJ AOT objects
-- remove unnecessary Requires(post) on java-gcj-compat
+* Wed Dec 21 2005 Jesse Keating <jkeating@redhat.com> 0:2.6.2-6jpp_1fc
+- rebuilt for new gcj
 
-  + Thierry Vignaud <tv@mandriva.org>
-    - kill file require on update-alternatives
+* Tue Dec 13 2005 Jesse Keating <jkeating@redhat.com>
+- rebuilt for new gcj
 
-* Wed Jul 18 2007 Anssi Hannula <anssi@mandriva.org> 0:2.9.0-4mdv2008.0
-+ Revision: 53216
-- use xml-commons-jaxp-1.3-apis and xml-commons-resolver12 explicitely
-  instead of the generic xml-commons-apis and xml-commons-resolver which
-  are provided by multiple packages (see bug #31473)
+* Fri Oct 07 2005 Ralph Apel <r.apel at r-apel.de> 0:2.7.1-1jpp
+- Upgrade to 2.7.1
 
+* Thu Jul 21 2005 Ralph Apel <r.apel at r-apel.de> 0:2.6.2-7jpp
+- Include target jars-dom3
+- Create new subpackage dom3
 
-* Sat Dec 16 2006 David Walluck <walluck@mandriva.org> 2.9.0-3mdv2007.0
-+ Revision: 98115
-- tighten BuildRequires
-- set noarch if no gcj_support
-- 2.9.0
-- Import xerces-j2
+* Mon Jul 18 2005 Gary Benson <gbenson at redhat.com> 0:2.6.2-5jpp_2fc
+- Build on ia64, ppc64, s390 and s390x.
+- Switch to aot-compile-rpm (also BC-compiles samples).
 
-* Sun Jun 04 2006 David Walluck <walluck@mandriva.org> 0:2.8.0-1mdv2007.0
-- 2.8.0
+* Wed Jul 13 2005 Gary Benson <gbenson at redhat.com> 0:2.6.2-6jpp
+- Build with Sun JDK (from <gareth.armstrong at hp.com>).
 
-* Fri Jun 02 2006 David Walluck <walluck@mandriva.org> 0:2.7.1-6.7.3mdv2007.0
-- rebuild for libgcj.so.7
+* Wed Jun 15 2005 Gary Benson <gbenson at redhat.com> 0:2.6.2-5jpp_1fc
+- Upgrade to 2.6.2-5jpp.
 
-* Sat Apr 22 2006 David Walluck <walluck@mandriva.org> 0:2.7.1-6.7.2mdk
-- recreate
+* Tue Jun 14 2005 Gary Benson <gbenson at redhat.com> 0:2.6.2-5jpp
+- Remove the tools tarball, and build xjavac from source.
+- Patch xjavac to fix the classpath under libgcj too.
 
-* Wed Apr 12 2006 David Walluck <walluck@mandriva.org> 0:2.7.1-6.7.1mdk
-- 2.7.1
+* Fri Jun 10 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_8fc
+- Remove the tools tarball, and build xjavac from source.
+- Replace classpath workaround to xjavac task and use
+  xml-commons classes again (#152255).
 
-* Sat Dec 03 2005 David Walluck <walluck@mandriva.org> 0:2.6.2-5.2.1mdk
-- sync with 5jpp_2fc
+* Thu May 26 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_7fc
+- Rearrange how BC-compiled stuff is built and installed.
 
-* Mon May 23 2005 David Walluck <walluck@mandriva.org> 0:2.6.2-4.2mdk
-- remove pre-compiled xjavac task
+* Mon May 23 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_6fc
+- Add alpha to the list of build architectures (#157522).
+- Use absolute paths for rebuild-gcj-db.
 
-* Sun May 22 2005 David Walluck <walluck@mandriva.org> 0:2.6.2-4.1mdk
-- release
+* Thu May  5 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_5fc
+- Add dependencies for %%post and %%postun scriptlets (#156901).
 
-* Fri Apr 29 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_3fc
+* Fri Apr 29 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_4fc
+- BC-compile.
+
+* Thu Apr 28 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_3fc
 - Revert xjavac classpath workaround, and patch to use libgcj's
   classes instead of those in xml-commons (#152255).
 
-* Fri Apr 22 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_2fc
+* Thu Apr 21 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_2fc
 - Add classpath workaround to xjavac task (#152255).
 
 * Wed Jan 12 2005 Gary Benson <gbenson@redhat.com> 0:2.6.2-4jpp_1fc
@@ -330,37 +423,37 @@ rm -f %{_javadir}/xerces.jar
 * Mon Nov 15 2004 Fernando Nasser <fnasser@redhat.com>  0:2.6.2-4jpp_1rh
 - Merge with upstream for 2.6.2 upgrade
 
-* Thu Nov 04 2004 Gary Benson <gbenson@redhat.com> 0:2.6.2-2jpp_5fc
+* Thu Nov  4 2004 Gary Benson <gbenson@redhat.com> 0:2.6.2-2jpp_5fc
 - Build into Fedora.
 
-* Fri Oct 29 2004 Gary Benson <gbenson@redhat.com> 0:2.6.2-2jpp_4fc
+* Thu Oct 28 2004 Gary Benson <gbenson@redhat.com> 0:2.6.2-2jpp_4fc
 - Bootstrap into Fedora.
 
-* Sat Oct 02 2004 Andrew Overholt <overholt@redhat.com> 0:2.6.2-2jpp_4rh
+* Fri Oct 1 2004 Andrew Overholt <overholt@redhat.com> 0:2.6.2-2jpp_4rh
 - add coreutils BuildRequires
 
-* Fri Oct 01 2004 Andrew Overholt <overholt@redhat.com> 0:2.6.2-2jpp_3rh
+* Thu Sep 30 2004 Andrew Overholt <overholt@redhat.com> 0:2.6.2-2jpp_3rh
 - Remove xml-commons-resolver as a Requires
 
-* Fri Aug 27 2004 Ralph Apel <r.apel at r-apel.de> 0:2.6.2-4jpp
+* Thu Aug 26 2004 Ralph Apel <r.apel at r-apel.de> 0:2.6.2-4jpp
 - Build with ant-1.6.2
 - Dropped jikes requirement, built for 1.4.2
 
-* Thu Jun 24 2004 Kaj J. Niemi <kajtzu@fi.basen.net> 0:2.6.2-3jpp
+* Wed Jun 23 2004 Kaj J. Niemi <kajtzu@fi.basen.net> 0:2.6.2-3jpp
 - Updated Patch #0 to fix breakage using BEA 1.4.2 SDK, new patch
   from <mwringe@redhat.com> and <vivekl@redhat.com>.
 
-* Tue Jun 22 2004 Vivek Lakshmanan <vivekl@redhat.com> 0:2.6.2-2jpp_2rh
+* Mon Jun 21 2004 Vivek Lakshmanan <vivekl@redhat.com> 0:2.6.2-2jpp_2rh
 - Added new Source1 URL and added new %%setup to expand it under the
   expanded result of Source0.
 - Updated Patch0 to fix version discrepancies.
 - Added build requirement for xml-commons-apis
-
-* Tue Jun 15 2004 Matt Wringe <mwringe@redhat.com> 0:2.6.2-2jpp_1rh
+ 
+* Mon Jun 14 2004 Matt Wringe <mwringe@redhat.com> 0:2.6.2-2jpp_1rh
 - Update to 2.6.2
 - made patch names comformant
 
-* Tue Mar 30 2004 Kaj J. Niemi <kajtzu@fi.basen.net> 0:2.6.2-2jpp
+* Mon Mar 29 2004 Kaj J. Niemi <kajtzu@fi.basen.net> 0:2.6.2-2jpp
 - Rebuilt with jikes 1.18 for java 1.3.1_11
 
 * Fri Mar 26 2004 Frank Ch. Eigler <fche@redhat.com> 0:2.6.1-1jpp_2rh
@@ -373,13 +466,3 @@ rm -f %{_javadir}/xerces.jar
 - RH vacuuming
 - remove jikes dependency
 - add nonjikes-cast.patch
-
-* Sun Feb 08 2004 David Walluck <david@anti-microsoft.org> 0:2.6.1-1jpp
-- 2.6.1
-- update Source0 URL
-- now requires xml-commons-resolver
-
-* Fri Jan 09 2004 Kaj J. Niemi <kajtzu@fi.basen.net> - 0:2.6.0-1jpp
-- Update to 2.6.0
-- Patch #1 (xerces-j2-manifest.patch) is unnecessary (upstream)
-

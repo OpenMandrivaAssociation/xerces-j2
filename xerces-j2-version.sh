@@ -2,7 +2,7 @@
 # 
 # Xerces-J2 version script
 # JPackage Project (http://www.jpackage.org/)
-# $Id$
+# $Id: xerces-j2-version.sh,v 1.3 2005/05/26 14:21:22 gbenson Exp $
 
 # Source functions library
 . /usr/share/java-utils/java-functions
