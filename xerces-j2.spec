@@ -5,9 +5,9 @@
 
 Name:          xerces-j2
 Version:       2.11.0
-Release:       16.1%{?dist}
+Release:       22.1
 Summary:       Java XML parser
-
+Group:         Development/Java
 License:       ASL 2.0
 URL:           http://xerces.apache.org/xerces2-j/
 
@@ -32,6 +32,10 @@ Patch0:        %{name}-build.patch
 # Patch the manifest so that it includes OSGi stuff
 Patch1:        %{name}-manifest.patch
 
+# Backported fix from upstream http://svn.apache.org/viewvc?view=revision&revision=1499506
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1140031
+Patch2:        xerces-j2-CVE-2013-4002.patch
+
 BuildArch:     noarch
 
 BuildRequires: java-devel >= 1:1.6.0
@@ -47,7 +51,7 @@ BuildRequires: dejavu-sans-fonts
 BuildRequires: fonts-ttf-dejavu
 %endif
 BuildRequires: xerces-j2
-Requires:      java
+Requires:      java-headless
 Requires:      jpackage-utils
 Requires:      xalan-j2 >= 2.7.1
 Requires:      xml-commons-apis >= 1.4.01
@@ -95,7 +99,7 @@ APIs are in use.
 
 %package        javadoc
 Summary:        Javadocs for %{name}
-
+Group:          Documentation
 Requires:       jpackage-utils
 
 # Consolidating all javadocs into one package
@@ -109,7 +113,7 @@ This package contains the API documentation for %{name}.
 
 %package        demo
 Summary:        Demonstrations and samples for %{name}
-
+Group:          Development/Java
 Requires:       %{name} = %{version}-%{release}
 
 %description    demo
@@ -119,6 +123,7 @@ Requires:       %{name} = %{version}-%{release}
 %setup -q -n xerces-%{cvs_version}
 %patch0 -p0 -b .orig
 %patch1 -p0 -b .orig
+%patch2 -p0 -b .orig
 
 # Copy the custom ant tasks into place
 mkdir -p tools/org/apache/xerces/util
@@ -187,7 +192,7 @@ cp -pr data %{buildroot}%{_datadir}/%{name}
 install -pD -T -m 644 %{SOURCE7} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 
 # Depmap with legacy depmaps for compatability
-%add_maven_depmap JPP-%{name}.pom %{name}.jar -a "xerces:xerces" -a "xerces:xmlParserAPIs"
+%add_maven_depmap JPP-%{name}.pom %{name}.jar -a "xerces:xerces,xerces:xmlParserAPIs,apache:xerces-j2"
 
 # jaxp_parser_impl ghost symlink
 ln -s %{_sysconfdir}/alternatives \
@@ -203,26 +208,39 @@ update-alternatives --install %{_javadir}/jaxp_parser_impl.jar \
   update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar
 } >/dev/null 2>&1 || :
 
-%files
+%files -f .mfiles
 %doc LICENSE NOTICE README
-%{_mavendepmapfragdir}/*
-%{_mavenpomdir}/*
 %{_javadir}/%{name}*
 %{_bindir}/*
 %{_mandir}/*/*
 %ghost %{_javadir}/jaxp_parser_impl.jar
 
 %files javadoc
-%{_javadocdir}/%{name}/impl
-%{_javadocdir}/%{name}/xs
-%{_javadocdir}/%{name}/xni
-%{_javadocdir}/%{name}/other
+%{_javadocdir}/%{name}
 
 %files demo
-%defattr(-,root,root,-)
 %{_datadir}/%{name}
 
 %changelog
+* Wed Sep 10 2014 Mat Booth <mat.booth@redhat.com> - 2.11.0-22
+- Add patch for CVE-2013-4002, rhbz #1140031
+- Fix ownership of javadoc directory
+
+* Mon Aug 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.11.0-21
+- Workaround regression in %%add_maven_depmap -a parameter handling
+
+* Mon Aug 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.11.0-20
+- Add alias for apache:xerces-j2
+
+* Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.11.0-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Thu May 29 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.11.0-18
+- Use .mfiles generated during build
+
+* Tue Mar 04 2014 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.11.0-17
+- Use Requires: java-headless rebuild (#1067528)
+
 * Tue Aug 6 2013 Krzysztof Daniel <kdaniel@redhat.com> 2.11.0-16
 - Fix FTBFS.
 
