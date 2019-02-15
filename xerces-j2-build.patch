@@ -1,5 +1,5 @@
---- build.xml.orig	2010-11-26 20:42:11.000000000 +0000
-+++ build.xml	2010-12-11 19:20:35.913500731 +0000
+--- x/build.xml.orig	2010-11-26 20:42:11.000000000 +0000
++++ x/build.xml	2010-12-11 19:20:35.913500731 +0000
 @@ -108,7 +108,6 @@
      <property name="distsrc.dir" value="${build.dir}/${parser.shortname}-${parser_version}"/>
      <property name="disttools.dir" value="${build.dir}/tools"/>

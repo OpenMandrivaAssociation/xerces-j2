@@ -1,0 +1,27 @@
+diff -up xerces-2_12_0/build.xml.5~ xerces-2_12_0/build.xml
+--- xerces-2_12_0/build.xml.5~	2019-02-15 19:27:31.253463965 +0100
++++ xerces-2_12_0/build.xml	2019-02-15 19:28:11.685092482 +0100
+@@ -669,10 +669,6 @@ Authors:
+   <!-- =================================================================== -->
+   <target name="pack-bin" depends="pack-bin-common, jars">
+     <copy file="${build.dir}/${jar.parser}" tofile="${distbin.dir}/${jar.parser}"/>
+-    <!-- include the xml-commons APIs -->
+-    <copy file="${tools.dir}/${jar.apis}" tofile="${distbin.dir}/${jar.apis}"/>
+-    <!-- include the xml-commons resolver -->
+-    <copy file="${tools.dir}/${jar.resolver}" tofile="${distbin.dir}/${jar.resolver}"/>
+     <!-- include the Xalan Serializer -->
+     <copy file="${tools.dir}/${jar.serializer}" tofile="${distbin.dir}/${jar.serializer}"/>
+ 
+@@ -912,12 +908,6 @@ Authors:
+   <!-- Builds xercesImpl, xml-apis and sample jar files                    -->
+   <!-- =================================================================== -->
+   <target name="jars" depends="jar, sampjar">
+-    <!-- include the xml-commons APIs -->
+-    <copy file="${tools.dir}/${jar.apis}" tofile="${build.dir}/${jar.apis}"/>
+-    <!-- include the xml-commons resolver -->
+-    <copy file="${tools.dir}/${jar.resolver}" tofile="${build.dir}/${jar.resolver}"/>
+-    <!-- include the Xalan Serializer -->
+-    <copy file="${tools.dir}/${jar.serializer}" tofile="${build.dir}/${jar.serializer}"/>
+   </target>
+ 
+   <!-- =================================================================== -->

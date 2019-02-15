@@ -1,0 +1,55 @@
+diff -up xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java.omv~ xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java
+--- xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java.omv~	2019-02-15 19:06:39.395420826 +0100
++++ xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java	2019-02-15 19:07:35.518371070 +0100
+@@ -127,6 +127,11 @@ public class HTMLFrameElementImpl
+         setAttribute( "src", src );
+     }
+ 
++    public Document getContentDocument()
++    {
++        return null;
++    }
++
+     
+     /**
+      * Constructor requires owner document.
+diff -up xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java.omv~ xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java
+--- xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java.omv~	2019-02-15 19:17:43.367250475 +0100
++++ xerces-2_12_0/src/org/apache/html/dom/HTMLFrameElementImpl.java	2019-02-15 19:17:58.755494280 +0100
+@@ -127,7 +127,7 @@ public class HTMLFrameElementImpl
+         setAttribute( "src", src );
+     }
+ 
+-    public Document getContentDocument()
++    public org.w3c.dom.Document getContentDocument()
+     {
+         return null;
+     }
+diff -up xerces-2_12_0/src/org/apache/html/dom/HTMLIFrameElementImpl.java.omv~ xerces-2_12_0/src/org/apache/html/dom/HTMLIFrameElementImpl.java
+--- xerces-2_12_0/src/org/apache/html/dom/HTMLIFrameElementImpl.java.omv~	2019-02-15 19:19:47.613213664 +0100
++++ xerces-2_12_0/src/org/apache/html/dom/HTMLIFrameElementImpl.java	2019-02-15 19:20:13.569622394 +0100
+@@ -161,6 +161,9 @@ public class HTMLIFrameElementImpl
+         super( owner, name );
+     }
+ 
+-
++    public org.w3c.dom.Document getContentDocument()
++    {
++        return null;
++    }
+ }
+ 
+diff -up xerces-2_12_0/src/org/apache/html/dom/HTMLObjectElementImpl.java.omv~ xerces-2_12_0/src/org/apache/html/dom/HTMLObjectElementImpl.java
+--- xerces-2_12_0/src/org/apache/html/dom/HTMLObjectElementImpl.java.omv~	2019-02-15 19:20:56.282294063 +0100
++++ xerces-2_12_0/src/org/apache/html/dom/HTMLObjectElementImpl.java	2019-02-15 19:21:21.353687812 +0100
+@@ -251,6 +251,9 @@ public class HTMLObjectElementImpl
+         super( owner, name );
+     }
+ 
+-
++    public org.w3c.dom.Document getContentDocument()
++    {
++        return null;
++    }
+ }
+ 
