@@ -38,7 +38,7 @@ Patch4:		xerces-2.12.0-dont-copy-system-libraries.patch
 
 BuildArch:     noarch
 
-BuildRequires: java-devel >= 1:1.6.0
+BuildRequires: java-11-openjdk
 BuildRequires: xml-commons-resolver >= 1.2
 BuildRequires: ant
 %if 0%{?fedora}
