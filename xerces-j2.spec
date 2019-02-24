@@ -39,20 +39,14 @@ Patch4:		xerces-2.12.0-dont-copy-system-libraries.patch
 BuildArch:     noarch
 
 BuildRequires: java-devel >= 1:1.6.0
-BuildRequires: jpackage-utils
-BuildRequires: xalan-j2 >= 2.7.1
 BuildRequires: xml-commons-resolver >= 1.2
 BuildRequires: ant
-BuildRequires: jaxp_parser_impl
 %if 0%{?fedora}
 BuildRequires: dejavu-sans-fonts
 %else
 BuildRequires: fonts-ttf-dejavu
 %endif
-BuildRequires: xerces-j2
 Requires:      java-headless
-Requires:      jpackage-utils
-Requires:      xalan-j2 >= 2.7.1
 Requires:      xml-commons-resolver >= 1.2
 
 Provides:      jaxp_parser_impl = 1.4
@@ -98,7 +92,6 @@ APIs are in use.
 %package        javadoc
 Summary:        Javadocs for %{name}
 Group:          Documentation
-Requires:       jpackage-utils
 
 # Consolidating all javadocs into one package
 Obsoletes:      %{name}-javadoc-impl < %{version}-%{release}
