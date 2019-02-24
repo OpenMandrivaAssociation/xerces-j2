@@ -89,19 +89,6 @@ also handles name spaces according to the XML Namespaces 1.1 Recommendation,
 and will correctly serialize XML 1.1 documents if the DOM level 3 load/save
 APIs are in use.
 
-%package        javadoc
-Summary:        Javadocs for %{name}
-Group:          Documentation
-
-# Consolidating all javadocs into one package
-Obsoletes:      %{name}-javadoc-impl < %{version}-%{release}
-Obsoletes:      %{name}-javadoc-xs < %{version}-%{release}
-Obsoletes:      %{name}-javadoc-xni < %{version}-%{release}
-Obsoletes:      %{name}-javadoc-other < %{version}-%{release}
-
-%description    javadoc
-This package contains the API documentation for %{name}.
-
 %package        demo
 Summary:        Demonstrations and samples for %{name}
 Group:          Development/Java
@@ -134,22 +121,11 @@ cd ..
 ant \
 	-Dtools.dir=%{_datadir}/java \
 	-Djar.resolver=xml-resolver.jar \
-	clean jars javadocs
+	clean jars
 
 %install
 # jars
 install -pD -T build/xercesImpl.jar %{buildroot}%{_javadir}/%{name}.jar
-
-# javadoc
-mkdir -p %{buildroot}%{_javadocdir}/%{name}
-mkdir -p %{buildroot}%{_javadocdir}/%{name}/impl
-mkdir -p %{buildroot}%{_javadocdir}/%{name}/xs
-mkdir -p %{buildroot}%{_javadocdir}/%{name}/xni
-mkdir -p %{buildroot}%{_javadocdir}/%{name}/other
-
-cp -pr build/docs/javadocs/xerces2/* %{buildroot}%{_javadocdir}/%{name}/impl
-cp -pr build/docs/javadocs/xni/* %{buildroot}%{_javadocdir}/%{name}/xni
-cp -pr build/docs/javadocs/other/* %{buildroot}%{_javadocdir}/%{name}/other
 
 # scripts
 install -pD -m755 -T %{SOURCE1} %{buildroot}%{_bindir}/%{name}-version
@@ -172,9 +148,6 @@ install -pD -T -m 644 %{SOURCE7} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 %{_javadir}/%{name}*
 %{_bindir}/*
 %{_mandir}/*/*
-
-%files javadoc
-%{_javadocdir}/%{name}
 
 %files demo
 %{_datadir}/%{name}
