@@ -5,7 +5,7 @@
 
 Name:          xerces-j2
 Version:       2.12.0
-Release:       1
+Release:       2
 Summary:       Java XML parser
 Group:         Development/Java
 License:       ASL 2.0
@@ -39,13 +39,10 @@ Patch4:		xerces-2.12.0-dont-copy-system-libraries.patch
 BuildArch:     noarch
 
 BuildRequires: java-11-openjdk
+BuildRequires: javapackages-local
 BuildRequires: xml-commons-resolver >= 1.2
 BuildRequires: ant
-%if 0%{?fedora}
-BuildRequires: dejavu-sans-fonts
-%else
 BuildRequires: fonts-ttf-dejavu
-%endif
 Requires:      java-headless
 Requires:      xml-commons-resolver >= 1.2
 
@@ -143,7 +140,11 @@ cp -pr data %{buildroot}%{_datadir}/%{name}
 # Pom
 install -pD -T -m 644 %{SOURCE7} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 
-%files
+# Depmap with legacy depmaps for compatability
+%add_maven_depmap JPP-%{name}.pom %{name}.jar -a "xerces:xerces,xerces:xmlParserAPIs,apache:xerces-j2"
+
+
+%files -f .mfiles
 %doc LICENSE NOTICE README
 %{_javadir}/%{name}*
 %{_bindir}/*
