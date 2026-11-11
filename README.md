@@ -1,2 +1,2 @@
-xerces-j2 is obsolete -- what used to be in xerces and xalan is now
-part of the java.xml module (part of OpenJDK).
+xerces-j2 builds Apache Xerces-J 2.12.2 as mvn(xerces:xercesImpl).
+The JDK java.xml module does not provide that Maven coordinate.
